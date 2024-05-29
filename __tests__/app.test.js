@@ -131,7 +131,7 @@ describe("News Api Tests",()=>{
                 })
             });
         })
-    }
+    })
     describe("GET/API/ARTICLES", ()=>{
         describe("Happy Path", ()=>{
             test("200: Returns an okay Status Code", ()=>{
