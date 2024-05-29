@@ -85,4 +85,51 @@ describe("News Api Tests",()=>{
 
         })
     })
+    describe("GET/API/ARTICLES/:ARTICLE_ID", ()=>{
+        describe("Happy Path", ()=>{
+            test("200: Returns an okay Status Code", ()=>{
+                return request(app)
+                .get("/api/articles/1")
+                .expect(200);
+            })
+            test("200: Returns the correct article", ()=>{
+                const desiredArticle = {
+                    article_id: 1,
+                    title: "Living in the shadow of a great man",
+                    topic: "mitch",
+                    author: "butter_bridge",
+                    body: "I find this existence challenging",
+                    created_at: '2020-07-09T20:11:00.000Z',
+                    votes: 100,
+                    article_img_url:
+                    "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                }
+                return request(app)
+                .get("/api/articles/1")
+                .expect(200)
+                .then(({body})=>{
+                    const article = body.article
+                    expect(article).toEqual(desiredArticle)
+                })
+            })
+        })
+        describe("Sad Path", ()=>{
+            test("400: Returns an error message when request parametric endpoint is not number", ()=>{
+                return request(app)
+                .get("/api/articles/not-a-number")
+                .expect(400)
+                .then(({body})=> {
+                    expect(body.msg).toBe("The article id must be an integer")
+                })
+            });
+            test("404: Returns an error message when the Id number does not exist", ()=>{
+                return request(app)
+                .get("/api/articles/999")
+                .expect(404)
+                .then(({body})=> {
+                    expect(body.msg).toBe("Article 999 does not exist.")
+                })
+            });
+        })
+    })
 })
