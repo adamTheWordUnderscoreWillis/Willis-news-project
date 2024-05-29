@@ -85,4 +85,149 @@ describe("News Api Tests",()=>{
 
         })
     })
+    describe("GET/API/ARTICLES/:ARTICLE_ID", ()=>{
+        describe("Happy Path", ()=>{
+            test("200: Returns an okay Status Code", ()=>{
+                return request(app)
+                .get("/api/articles/1")
+                .expect(200);
+            })
+            test("200: Returns the correct article", ()=>{
+                const desiredArticle = {
+                    article_id: 1,
+                    title: "Living in the shadow of a great man",
+                    topic: "mitch",
+                    author: "butter_bridge",
+                    body: "I find this existence challenging",
+                    created_at: '2020-07-09T20:11:00.000Z',
+                    votes: 100,
+                    article_img_url:
+                    "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                }
+                return request(app)
+                .get("/api/articles/1")
+                .expect(200)
+                .then(({body})=>{
+                    const article = body.article
+                    expect(article).toEqual(desiredArticle)
+                })
+            })
+        })
+        describe.only("Sad Path", ()=>{
+            test("400: Returns an error message when request parametric endpoint is not number", ()=>{
+                return request(app)
+                .get("/api/articles/not-a-number")
+                .expect(400)
+                .then(({body})=> {
+                    console.log(body)
+                    expect(body.msg).toBe("The article id must be an integer")
+                })
+            });
+            test("404: Returns an error message when the Id number does not exist", ()=>{
+                return request(app)
+                .get("/api/articles/999")
+                .expect(404)
+                .then(({body})=> {
+                    expect(body.msg).toBe("Article 999 does not exist.")
+                })
+            });
+        })
+    })
+    describe("GET/API/ARTICLES", ()=>{
+        describe("Happy Path", ()=>{
+            test("200: Returns an okay Status Code", ()=>{
+                return request(app)
+                .get("/api/articles")
+                .expect(200);
+            })
+            test("200: Returns all articles with correct key value pairs (except the comment count)", ()=>{
+                const desiredArticle = {
+                    article_id: 1,
+                    title: "Living in the shadow of a great man",
+                    topic: "mitch",
+                    author: "butter_bridge",
+                    body: "I find this existence challenging",
+                    created_at: '2020-07-09T20:11:00.000Z',
+                    votes: 100,
+                    article_img_url:
+                    "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+                }
+                
+                return request(app)
+                .get("/api/articles")
+                .expect(200)
+                .then(({body})=>{
+                    const { articles } = body
+                    const lastArticle = articles[12]
+
+                    expect(articles).toHaveLength(13)
+                    expect(lastArticle).toMatchObject(desiredArticle)
+                    
+                    articles.forEach((article)=>{
+                        expect(article).toMatchObject({
+                            article_id: expect.any(Number),
+                            title: expect.any(String),
+                            topic: expect.any(String),
+                            author: expect.any(String),
+                            body: expect.any(String),
+                            created_at: expect.any(String),
+                            votes: expect.any(Number),
+                            article_img_url: expect.any(String)
+                        })
+                    })
+                    
+                    
+                })
+            })
+            test("200: Returns the count of the comments", ()=>{
+                return request(app)
+                .get("/api/articles")
+                .expect(200)
+                .then(({body})=>{
+                    const {articles} = body
+                    const firstArticle = articles[0]
+                    const lastArticle = articles[12]
+                    expect(firstArticle.comment_count).toBe(0)
+                    expect(lastArticle.comment_count).toBe(11)
+                })
+            })
+        })
+        
+        describe("Sad Path", ()=>{
+            test("404: Returns with an error message when the path is not found", ()=>{
+                return request(app)
+                .get("/api/not-a-route")
+                .expect(404)
+                .then(({body})=> {
+                    expect(body.msg).toBe("Does not exist")
+                })
+            });
+        })
+        /* PSUDEOCODE FOR API ARTICLES
+
+            Description: 
+                Returns an articles array of article objects, each of which should have the following properties:
+                    author
+                    title
+                    article_id
+                    topic
+                    created_at
+                    votes
+                    article_img_url
+                    comment_count,
+
+            TESTS
+
+            Happy Path Tests
+                first Test: basic status code okay
+                Second Test: returns all data from within the articles. Check all have the data and the data is correct on aleast one.
+                Third Test: Working out the comment count. Making sure it is the total of each article.
+            
+            Sad Path Tests
+            first Test: 404 which should already be covered
+
+            Remember to add a description of this endpoint to your /api endpoint
+
+        */
+    })
 })
