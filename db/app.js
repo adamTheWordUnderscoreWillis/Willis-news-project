@@ -2,10 +2,9 @@ const express = require('express');
 const app = express();
 const { getAllTopics } = require('./controllers/topics.controller');
 const { getAllEndpoints } = require('./controllers/api.controller');
+
 const { getArticleById, getAllArticles } = require('./controllers/articles.controller');
 const { handleCustomErrors, handle404Errors, handleServerErrors, handlePsqlErrors } = require("../db/errorHandling/index.js")
-
-
 
 app.get('/api/topics', getAllTopics);
 app.get('/api', getAllEndpoints);

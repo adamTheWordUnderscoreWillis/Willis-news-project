@@ -131,7 +131,7 @@ describe("News Api Tests",()=>{
                 })
             });
         })
-    })
+    }
     describe("GET/API/ARTICLES", ()=>{
         describe("Happy Path", ()=>{
             test("200: Returns an okay Status Code", ()=>{
@@ -202,31 +202,5 @@ describe("News Api Tests",()=>{
                 })
             });
         })
-        /* PSUDEOCODE FOR API ARTICLES
-
-            Description: 
-                Returns an articles array of article objects, each of which should have the following properties:
-                    author
-                    title
-                    article_id
-                    topic
-                    created_at
-                    votes
-                    article_img_url
-                    comment_count,
-
-            TESTS
-
-            Happy Path Tests
-                first Test: basic status code okay
-                Second Test: returns all data from within the articles. Check all have the data and the data is correct on aleast one.
-                Third Test: Working out the comment count. Making sure it is the total of each article.
-            
-            Sad Path Tests
-            first Test: 404 which should already be covered
-
-            Remember to add a description of this endpoint to your /api endpoint
-
-        */
     })
 })

@@ -15,8 +15,8 @@ exports.fetchArticleById = (article_id)=>{
         }
           return article
         })
-    }
 
+}
     exports.fetchAllArticles = ()=>{
         const queryStatment = `
         SELECT articles.*, COUNT(comments.article_id) FROM articles
