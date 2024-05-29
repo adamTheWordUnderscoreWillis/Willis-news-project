@@ -113,13 +113,12 @@ describe("News Api Tests",()=>{
                 })
             })
         })
-        describe.only("Sad Path", ()=>{
+        describe("Sad Path", ()=>{
             test("400: Returns an error message when request parametric endpoint is not number", ()=>{
                 return request(app)
                 .get("/api/articles/not-a-number")
                 .expect(400)
                 .then(({body})=> {
-                    console.log(body)
                     expect(body.msg).toBe("The article id must be an integer")
                 })
             });
