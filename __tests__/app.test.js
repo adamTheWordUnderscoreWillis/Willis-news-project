@@ -203,4 +203,72 @@ describe("News Api Tests",()=>{
             });
         })
     })
+    describe.only("GET/API/ARTICLES/:ARTICLE_ID/comments",()=>{
+        // Remember to add this to the endpoint document
+        describe("Happy Path", ()=>{
+            test("200: Returns an okay Status Code", ()=>{
+                return request(app)
+                .get("/api/articles/1/comments")
+                .expect(200);
+            })
+            test("200: Retrieves an empty array if no comments are made", ()=>{
+                return request(app)
+                .get("/api/articles/2/comments")
+                .expect(200)
+                .then(({body})=>{
+                    const { comments } = body
+                    expect(comments).toEqual([])
+                    expect(comments.length).toBe(0)
+                })
+            })
+            test("200: Retrieves an array of comments by article Id", ()=>{
+                const desiredcomment = {
+                        comment_id: 5,
+                        body: 'I hate streaming noses',
+                        article_id: 1,
+                        author: 'icellusedkars',
+                        votes: 0,
+                        created_at: '2020-11-03T21:00:00.000Z'
+                }
+                return request(app)
+                .get("/api/articles/1/comments")
+                .expect(200)
+                .then(({body})=>{
+                    const { comments } = body
+                    expect(comments[0]).toEqual(desiredcomment)
+                    expect(comments.length).toBe(11)
+
+
+                    comments.forEach((comment)=>{
+                        expect(comment).toMatchObject({
+                            comment_id: expect.any(Number),
+                            body: expect.any(String),
+                            article_id: 1,
+                            author: expect.any(String),
+                            votes: expect.any(Number),
+                            created_at: expect.any(String),
+                        })
+                    })
+                })
+            })
+        })
+        describe("Sad Path", ()=>{
+            test("400: Returns an error message when request parametric endpoint is not a number", ()=>{
+                return request(app)
+                .get("/api/articles/not-a-number/comments")
+                .expect(400)
+                .then(({body})=> {
+                    expect(body.msg).toBe("The article id must be an integer")
+                })
+            });
+            test("404: Returns an error message when the Id number does not exist", ()=>{
+                return request(app)
+                .get("/api/articles/999/comments")
+                .expect(404)
+                .then(({body})=> {
+                    expect(body.msg).toBe("Article 999 does not exist.")
+                })
+            });
+        })
+    })
 })

@@ -34,3 +34,29 @@ exports.fetchArticleById = (article_id)=>{
               return rows
         })
     }
+    exports.fetchCommentsByArticleId = (article_id)=>{
+        const queryStatment = `
+        SELECT * FROM comments
+        WHERE article_id = $1
+        ORDER BY created_at DESC;`
+        return db
+        .query(queryStatment, [article_id])
+        .then(({rows})=> {
+              return rows
+        })
+    }
+    exports.checkArticleIdExists =(article_id)=>{
+        const queryStatment = `
+        SELECT * FROM articles
+        WHERE article_id = $1`
+        return db
+        .query(queryStatment, [article_id])
+        .then(({rows})=> {
+            if(!rows[0]){
+                    return Promise.reject({
+                        status: 404,
+                        msg: `Article ${article_id} does not exist.`
+                    })
+            }
+        })    
+    }
