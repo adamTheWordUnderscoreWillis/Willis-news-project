@@ -3,7 +3,7 @@ const app = express();
 const { getAllTopics } = require('./controllers/topics.controller');
 const { getAllEndpoints } = require('./controllers/api.controller');
 const { getArticleById } = require('./controllers/articles.controller');
-const { handleCustomErrors, handle404Errors } = require("../db/errorHandling/index.js")
+const { handleCustomErrors, handle404Errors, handlePsqlErrors, handleServerErrors } = require("../db/errorHandling/index.js")
 
 
 
@@ -12,6 +12,8 @@ app.get('/api', getAllEndpoints);
 app.get("/api/articles/:article_id", getArticleById)
 
 app.use(handleCustomErrors);
+app.use(handlePsqlErrors);
+app.use(handleServerErrors);
 
 app.all("*", handle404Errors);
 
