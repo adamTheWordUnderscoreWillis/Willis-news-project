@@ -1,6 +1,6 @@
 const db = require('../connection')
 
-function fetchTopics() {
+function fetchAllTopics() {
     return db
     .query('SELECT * FROM topics')
     .then(({rows})=> {
@@ -8,4 +8,4 @@ function fetchTopics() {
     })
 }
 
-module.exports = { fetchTopics }
+module.exports = { fetchAllTopics }

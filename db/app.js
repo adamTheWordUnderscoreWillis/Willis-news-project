@@ -1,15 +1,18 @@
 const express = require('express');
 const app = express();
-const { getTopics } = require('./controllers/topics.controller');
-const { getEndpoints } = require('./controllers/api.controller');
+const { getAllTopics } = require('./controllers/topics.controller');
+const { getAllEndpoints } = require('./controllers/api.controller');
+const { getArticleById } = require('./controllers/articles.controller');
+const { handleCustomErrors, handle404Errors } = require("../db/errorHandling/index.js")
 
 
 
-app.get('/api/topics', getTopics);
-app.get('/api', getEndpoints);
+app.get('/api/topics', getAllTopics);
+app.get('/api', getAllEndpoints);
+app.get("/api/articles/:article_id", getArticleById)
 
-app.all("*", (req, res) =>{
-    res.status(404).send({msg: "Does not exist"})
-})
+app.use(handleCustomErrors);
+
+app.all("*", handle404Errors);
 
 module.exports = app;
