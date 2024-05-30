@@ -116,7 +116,7 @@ describe("News Api Tests", () => {
           .get("/api/articles/not-a-number")
           .expect(400)
           .then(({ body }) => {
-            expect(body.msg).toBe("The article id must be an integer");
+            expect(body.msg).toBe("Ah sorry, you can only input a number!");
           });
       });
       test("404: Returns an error message when the Id number does not exist", () => {
@@ -184,7 +184,7 @@ describe("News Api Tests", () => {
       });
     });
   });
-  describe("GET/API/ARTICLES/:ARTICLE_ID/comments", () => {
+  describe("GET/API/ARTICLES/:ARTICLE_ID/COMMENTS", () => {
     describe("Happy Path", () => {
       test("200: Returns an okay Status Code", () => {
         return request(app).get("/api/articles/1/comments").expect(200);
@@ -235,7 +235,7 @@ describe("News Api Tests", () => {
           .get("/api/articles/not-a-number/comments")
           .expect(400)
           .then(({ body }) => {
-            expect(body.msg).toBe("The article id must be an integer");
+            expect(body.msg).toBe("Ah sorry, you can only input a number!");
           });
       });
       test("404: Returns an error message when the Id number does not exist", () => {
@@ -250,7 +250,7 @@ describe("News Api Tests", () => {
   });
   describe("POST/API/ARTICLES/:ARTICLE_ID/COMMENTS", () => {
     describe("Happy Path", () => {
-      test("200: Returns an okay Status Code", () => {
+      test("201: Returns a Created Status Code", () => {
         const inputBody = {
             body: "My Spoon is too big!",
             username: "butter_bridge",
@@ -258,9 +258,9 @@ describe("News Api Tests", () => {
         return request(app)
         .post("/api/articles/1/comments")
         .send(inputBody)
-        .expect(200);
+        .expect(201);
       });
-      test("200: Inserts the comment into the database", () => {
+      test("201: Inserts the comment into the database", () => {
         const inputBody = {
           body: "My Spoon is too big!",
           username: "butter_bridge",
@@ -276,7 +276,7 @@ describe("News Api Tests", () => {
         return request(app)
           .post("/api/articles/2/comments")
           .send(inputBody)
-          .expect(200)
+          .expect(201)
           .then(({ body }) => {
             expect(body.comment).toMatchObject(expectedResponseBody);
           });
@@ -293,7 +293,7 @@ describe("News Api Tests", () => {
           .send(inputBody)
           .expect(400)
           .then(({ body }) => {
-            expect(body.msg).toBe("The article id must be an integer");
+            expect(body.msg).toBe("Ah sorry, you can only input a number!");
           });
       });
       test("400: Returns an error message when the object body is malformed", () => {
@@ -306,7 +306,7 @@ describe("News Api Tests", () => {
           .expect(400)
           .then(({ body }) => {
             expect(body.msg).toBe(
-              "When inputing comments you must include a body"
+              "Sorry, but to perform this action on our comments, a body input is required!"
             );
           });
       });
@@ -338,4 +338,104 @@ describe("News Api Tests", () => {
       });
     });
   });
+  describe("PATCH/API/ARTICLES/:ARTICLE_ID",()=>{
+    describe("Happy Path",()=>{
+        test("201: Returns Created Status Code", () => {
+            const newPatch = {inc_votes: 50};
+            return request(app)
+            .patch("/api/articles/2")
+            .send(newPatch)
+            .expect(201);
+        })
+        test("201: Increments the votes in the selected article", () => {
+            const newPatch = {inc_votes: 1};
+            const desiredArticle = {
+                article_id: 1,
+                title: "Living in the shadow of a great man",
+                topic: "mitch",
+                author: "butter_bridge",
+                body: "I find this existence challenging",
+                created_at: "2020-07-09T20:11:00.000Z",
+                votes: 101,
+                article_img_url:
+                  "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+              };
+            return request(app)
+              .patch("/api/articles/1")
+              .send(newPatch)
+              .expect(201)
+              .then(({ body }) => {
+                expect(body.article).toMatchObject(desiredArticle);
+              });
+          });
+          test("201: Decrements the votes in the selected article", () => {
+            const newPatch = {inc_votes: -20};
+            const desiredArticle = {
+                article_id: 1,
+                title: "Living in the shadow of a great man",
+                topic: "mitch",
+                author: "butter_bridge",
+                body: "I find this existence challenging",
+                created_at: "2020-07-09T20:11:00.000Z",
+                votes: 81,
+                article_img_url:
+                  "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+              };
+            return request(app)
+              .patch("/api/articles/1")
+              .send(newPatch)
+              .expect(201)
+              .then(({ body }) => {
+                expect(body.article).toMatchObject(desiredArticle);
+              });
+          });
+    })
+    describe("Sad Path",()=>{
+        test("400: Returns an error message when request parametric endpoint is not a number", () => {
+            const newPatch = {inc_votes: 1};
+            return request(app)
+              .patch("/api/articles/not-a-number")
+              .send(newPatch)
+              .expect(400)
+              .then(({ body }) => {
+                expect(body.msg).toBe("Ah sorry, you can only input a number!");
+              });
+          });
+          test("400: Returns an error message when the object body is malformed", () => {
+            const wrongPatch = {wrongKey: 1};
+            return request(app)
+              .patch("/api/articles/2")
+              .send(wrongPatch)
+              .expect(400)
+              .then(({ body }) => {
+                expect(body.msg).toBe(
+                  "Sorry, but to perform this action on our articles, a votes input is required!"
+                );
+              });
+          });
+          test("400: Returns an error message when the key is the wrong type", () => {
+            const wrongTypePatch = {inc_votes: "word"};
+            return request(app)
+              .patch("/api/articles/2")
+              .send(wrongTypePatch)
+              .expect(400)
+              .then(({ body }) => {
+                expect(body.msg).toBe(
+                  "Ah sorry, you can only input a number!"
+                );
+              });
+          });
+          test("404: Returns an error message when the Id number does not exist", () => {
+            const newPatch = {inc_votes: 1};
+            return request(app)
+              .patch("/api/articles/999")
+              .send(newPatch)
+              .expect(404)
+              .then(({ body }) => {
+                expect(body.msg).toBe("Article 999 does not exist.");
+              });
+          });
+
+    })
+  })
 })
