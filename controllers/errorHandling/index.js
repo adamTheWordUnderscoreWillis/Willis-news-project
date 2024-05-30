@@ -12,11 +12,9 @@ exports.handlePsqlErrors = (err,req,res,next)=>{
         const {column, table} = err
        return res.status(400).send({ msg: `Sorry, but to perform this action on our ${table}, a ${column} input is required!`})
     }
-    else if(err.code === '23503'){
-        console.log(req.body)
-        console.log(err)
-       return res.status(400).send({msg: "something" })
-    }
+    // else if(err.code === '23503'){
+    //    return res.status(400).send({msg: "something" })
+    // }
     else next(err);
 }
 

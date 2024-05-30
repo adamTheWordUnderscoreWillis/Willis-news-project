@@ -4,7 +4,7 @@ const app = require("../db/app");
 const data = require("../db/data/test-data/index");
 const seed = require("../db/seeds/seed");
 
-beforeAll(() => seed(data));
+beforeEach(() => seed(data));
 afterAll(() => db.end());
 
 describe("News Api Tests", () => {
@@ -266,7 +266,7 @@ describe("News Api Tests", () => {
           username: "butter_bridge",
         };
         const expectedResponseBody = {
-          comment_id: 20,
+          comment_id: 19,
           body: "My Spoon is too big!",
           article_id: 2,
           author: "butter_bridge",
@@ -377,7 +377,7 @@ describe("News Api Tests", () => {
                 author: "butter_bridge",
                 body: "I find this existence challenging",
                 created_at: "2020-07-09T20:11:00.000Z",
-                votes: 81,
+                votes: 80,
                 article_img_url:
                   "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
               };
@@ -426,16 +426,70 @@ describe("News Api Tests", () => {
               });
           });
           test("404: Returns an error message when the Id number does not exist", () => {
-            const newPatch = {inc_votes: 1};
-            return request(app)
+              const newPatch = {inc_votes: 1};
+              return request(app)
               .patch("/api/articles/999")
               .send(newPatch)
               .expect(404)
               .then(({ body }) => {
-                expect(body.msg).toBe("Article 999 does not exist.");
+                  expect(body.msg).toBe("Article 999 does not exist.");
+                });
+            });
+
+        })
+  })
+  describe("DELETE/API/COMMENTS/:COMMENT_ID",()=>{
+    describe("Happy Path",()=> {
+        test("204: Returns No Content Status Code", () => {
+            return request(app)
+            .delete("/api/comments/1")
+            .expect(204)
+            .then(({body})=>{
+                expect(body).not.toContain(expect.anything())
+            })
+        })
+        test("204: Deletes the correct comment", () => {
+            const deletedComment = {
+                comment_id: 1,
+                body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+                article_id: 9,
+                author: 'butter_bridge',
+                votes: 16,
+                created_at: '2020-04-06T12:17:00.000Z'
+              }
+            return request(app)
+            .delete("/api/comments/1")
+            .then(()=>{
+                return request(app)
+                .get("/api/articles/9/comments")
+                .then(({ body }) => {
+                    const { comments } = body;
+                    comments.forEach((comment)=>{
+                        expect(comment).not.toMatchObject(deletedComment)
+                    })
+                    expect(comments.length).toBe(1);
+                });
+            });
+        });
+    });
+    describe("Sad Path",()=>{
+        test("400: Returns an error message when request parametric endpoint is not a number", () => {
+            return request(app)
+            .delete("/api/comments/not-a-number")
+            .expect(400)
+            .then(({ body }) => {
+                expect(body.msg).toBe("Ah sorry, you can only input a number!");
+            });
+          });
+          
+        test("404: Returns an error message when the Id number does not exist", () => {
+          return request(app)
+              .delete("/api/comments/999")
+              .expect(404)
+              .then(({ body }) => {
+                expect(body.msg).toBe("Comment 999 does not exist.");
               });
           });
-
     })
   })
 })
