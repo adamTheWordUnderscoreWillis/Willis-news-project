@@ -4,6 +4,7 @@ const { getAllTopics } = require('../controllers/topics.controller.js');
 const { getAllEndpoints } = require('../controllers/api.controller.js');
 const { getArticleById, getAllArticles, getCommentsbyArticleId, createCommentsByArticleId, updateArticleVotes } = require('../controllers/articles.controller.js');
 const { handleCustomErrors, handle404Errors, handleServerErrors, handlePsqlErrors } = require("../controllers/errorHandling/index.js");
+const { removeCommentById } = require('../controllers/comments.controller.js');
 
 app.use(express.json())
 
@@ -16,6 +17,8 @@ app.get("/api/articles/:article_id/comments", getCommentsbyArticleId);
 app.post("/api/articles/:article_id/comments", createCommentsByArticleId);
 
 app.patch("/api/articles/:article_id", updateArticleVotes);
+
+app.delete("/api/comments/:comment_id", removeCommentById)
 
 
 
