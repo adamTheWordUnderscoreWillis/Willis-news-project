@@ -1,4 +1,4 @@
-const db = require('../connection')
+const db = require('../db/connection')
 const { getAllArticles } = require('../controllers/articles.controller')
 
 exports.fetchArticleById = (article_id)=>{
@@ -59,4 +59,38 @@ exports.fetchArticleById = (article_id)=>{
                     })
             }
         })    
+    }
+    exports.checkUserExists = (body)=>{
+        const {username}  = body
+        const queryStatment = `
+        SELECT * FROM users
+        WHERE username = $1`
+        return db
+        .query(queryStatment, [username])
+        .then(({rows})=> {
+            if(!rows[0]){
+                    return Promise.reject({
+                        status: 400,
+                        msg: `The username ${username} does not exist.`
+                    })
+            }
+        })
+    }
+
+    exports.addCommentsByArticleId = (article_id, comment)=>{
+        const { body, username } = comment
+        const queryStatment = `
+        INSERT INTO COMMENTS
+        (body, article_id, author)
+        VALUES
+        ($1, $2, $3)
+        RETURNING*`
+        const queryValues = [body, article_id, username]
+
+        return db
+        .query(queryStatment, queryValues)
+        .then(({rows})=>{
+            const comment = rows[0]
+            return comment
+        })
     }

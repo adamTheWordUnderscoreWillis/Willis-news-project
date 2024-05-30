@@ -1,4 +1,4 @@
-const {fetchArticleById, fetchAllArticles, fetchCommentsByArticleId, checkArticleIdExists} = require("../models/articles.models")
+const {fetchArticleById, fetchAllArticles, fetchCommentsByArticleId, checkArticleIdExists, addCommentsByArticleId, checkUserExists} = require("../models/articles.models")
 exports.getArticleById = (req,res,next) => {
     const { article_id } = req.params;
     
@@ -27,4 +27,19 @@ exports.getCommentsbyArticleId = (req,res, next)=>{
         res.status(200).send({comments})
     })
     .catch((err)=> next(err))
+}
+
+exports.createCommentsByArticleId = (req,res,next)=>{
+    const { article_id } = req.params
+    const { body } = req
+
+    const promises = [checkArticleIdExists(article_id), checkUserExists(body),  addCommentsByArticleId(article_id, body)]
+    Promise.all(promises)
+    .then((resolvedPromises)=>{
+        const comment = resolvedPromises[2]
+        res.status(200).send({comment})
+    })
+    .catch((err)=> {
+        next(err)
+    })
 }
