@@ -19,16 +19,16 @@ exports.fetchArticleById = (article_id)=>{
 }
     exports.fetchAllArticles = ()=>{
         const queryStatment = `
-        SELECT articles.*, COUNT(comments.article_id) FROM articles
+        SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.article_id) FROM articles
         LEFT JOIN comments ON articles.article_id = comments.article_id
         GROUP BY (articles.article_id)
-        ORDER BY article_id DESC;`
+        ORDER BY articles.article_id DESC;`
         return db
         .query(queryStatment)
         .then(({rows})=> {
             for(let articleIndex = 0; articleIndex<rows.length; articleIndex++){
                 const currentArticle = rows[articleIndex]
-                currentArticle.comment_count = parseInt(currentArticle.count)
+                currentArticle.comment_count = currentArticle.count
                 delete currentArticle.count
             }
               return rows
