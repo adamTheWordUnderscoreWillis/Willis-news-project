@@ -147,13 +147,6 @@ describe("News Api Tests", () => {
             "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
         };
 
-        return request(app)
-          .get("/api/articles")
-          .expect(200)
-          .then(({ body }) => {
-            const { articles } = body;
-            const lastArticle = articles[12];
-
             expect(articles).toHaveLength(13);
             expect(lastArticle).toMatchObject(desiredArticle);
 
