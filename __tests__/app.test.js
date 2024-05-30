@@ -203,7 +203,7 @@ describe("News Api Tests",()=>{
             });
         })
     })
-    describe.only("GET/API/ARTICLES/:ARTICLE_ID/comments",()=>{
+    describe("GET/API/ARTICLES/:ARTICLE_ID/comments",()=>{
         // Remember to add this to the endpoint document
         describe("Happy Path", ()=>{
             test("200: Returns an okay Status Code", ()=>{
