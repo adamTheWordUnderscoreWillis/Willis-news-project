@@ -94,3 +94,20 @@ exports.fetchArticleById = (article_id)=>{
             return comment
         })
     }
+    exports.insertArticleVotes = (article_id, body) =>{
+        const {inc_votes} = body
+        const queryStatment = `
+        UPDATE articles
+            SET
+            votes = votes + $1
+            WHERE article_id = $2
+        RETURNING*;
+        `
+        const queryValues = [inc_votes, article_id]
+        return db
+        .query(queryStatment, queryValues)
+        .then(({rows})=>{
+            const article = rows[0]
+            return article
+        })
+    }

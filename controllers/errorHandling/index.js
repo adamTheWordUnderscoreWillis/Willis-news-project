@@ -6,11 +6,11 @@ exports.handleCustomErrors = (err,req,res,next)=>{
 }
 exports.handlePsqlErrors = (err,req,res,next)=>{
     if(err.code === '22P02'){
-       return res.status(400).send({ msg: "The article id must be an integer"})
+       return res.status(400).send({ msg: "Ah sorry, you can only input a number!"})
     }
     else if(err.code === '23502'){
         const {column, table} = err
-       return res.status(400).send({ msg: `When inputing ${table} you must include a ${column}`})
+       return res.status(400).send({ msg: `Sorry, but to perform this action on our ${table}, a ${column} input is required!`})
     }
     else if(err.code === '23503'){
         console.log(req.body)
