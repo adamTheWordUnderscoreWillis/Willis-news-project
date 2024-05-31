@@ -3,7 +3,14 @@ const { getAllArticles } = require('../controllers/articles.controller')
 const { createRef } = require('../db/seeds/utils')
 
 exports.fetchArticleById = (article_id)=>{
-    const queryStatment = 'SELECT * FROM articles WHERE article_id = $1'
+    const queryStatment = `
+    SELECT articles.*, COUNT(comments.article_id) 
+    FROM articles
+    JOIN comments
+    ON articles.article_id = comments.article_id
+    WHERE articles.article_id = $1
+    GROUP BY (articles.article_id);
+    `
     return db
     .query(queryStatment,[article_id])
     .then(({rows})=> {
@@ -14,7 +21,9 @@ exports.fetchArticleById = (article_id)=>{
                 msg: `Article ${article_id} does not exist.`
             })
         }
-          return article
+            article.comment_count = article.count
+            delete article.count
+            return article
         })
 
 }
