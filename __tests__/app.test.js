@@ -145,7 +145,8 @@ describe("News Api Tests", () => {
           article_img_url:
             "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
           comment_count: "11"
-        };
+        }
+        
         return request(app)
           .get("/api/articles")
           .expect(200)
@@ -171,8 +172,61 @@ describe("News Api Tests", () => {
             });
           });
       });
+      test("200: Returns only articles related to a topic when queried",()=>{
+        const CatsArticle = {
+            article_id: 5,
+            title: "UNCOVERED: catspiracy to bring down democracy",
+            topic: "cats",
+            author: "rogersop",
+            created_at: "2020-08-03T13:14:00.000Z",
+            votes: 0,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            comment_count: "2"
+            }
+            return request(app)
+            .get("/api/articles?topic=cats")
+            .expect(200)
+            .then(({ body }) => {
+            const { articles } = body;
+            const firstArticle = articles[0];
+
+            expect(articles).toHaveLength(1);
+            expect(firstArticle).toMatchObject(CatsArticle);
+
+            })
+        });
+        test("200: Returns an empty array when there category is valid but has no data",()=>{
+              return request(app)
+              .get("/api/articles?topic=paper")
+              .expect(200)
+              .then(({ body }) => {
+              const { articles } = body;
+        
+              expect(articles).toHaveLength(0);
+              })
+          })
     });
-  });
+    describe("Sad Path", ()=>{
+      test("400: User has tried to query with invalid category", ()=>{
+        return request(app)
+          .get("/api/articles?nonCategory=cats")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("That query is not valid");
+          });
+      })
+      test("400: User has tried to query with invalid parameter", ()=>{
+        return request(app)
+          .get("/api/articles?topic=NotTopic")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe(`The Topic "NotTopic" is not one we cover I'm afraid.`);
+          });
+      })
+
+    })
+  })
   describe("GET/API/ARTICLES/:ARTICLE_ID/COMMENTS", () => {
     describe("Happy Path", () => {
       test("200: Returns an okay Status Code", () => {
@@ -510,4 +564,5 @@ describe("News Api Tests", () => {
       });
     });
   });
+
 })

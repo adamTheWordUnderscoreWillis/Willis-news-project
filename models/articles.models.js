@@ -1,5 +1,6 @@
 const db = require('../db/connection')
 const { getAllArticles } = require('../controllers/articles.controller')
+const { createRef } = require('../db/seeds/utils')
 
 exports.fetchArticleById = (article_id)=>{
     const queryStatment = 'SELECT * FROM articles WHERE article_id = $1'
@@ -17,14 +18,34 @@ exports.fetchArticleById = (article_id)=>{
         })
 
 }
-    exports.fetchAllArticles = ()=>{
-        const queryStatment = `
+    exports.fetchAllArticles = (query)=>{
+        
+        const {topic} = query
+        const queryValues = []
+        let queryStatment = `
         SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.article_id) FROM articles
-        LEFT JOIN comments ON articles.article_id = comments.article_id
-        GROUP BY (articles.article_id)
+        LEFT JOIN comments ON articles.article_id = comments.article_id`
+        const queryGroupBy = `
+        GROUP BY (articles.article_id)`
+        const queryOrderBy = `
         ORDER BY articles.article_id DESC;`
+        const greenList = ["topic"]
+        const QueryKeys = Object.keys(query)
+        const firstKey = QueryKeys[0]
+        if(QueryKeys[0] && !greenList.includes(firstKey)){
+            return Promise.reject({
+                status: 400,
+                msg: `That query is not valid`
+            })
+        }
+        if(topic){
+            queryValues.push(topic)
+            queryStatment += `
+            WHERE topic = $1`
+        }
+        queryStatment += queryGroupBy + queryOrderBy
         return db
-        .query(queryStatment)
+        .query(queryStatment,queryValues)
         .then(({rows})=> {
             for(let articleIndex = 0; articleIndex<rows.length; articleIndex++){
                 const currentArticle = rows[articleIndex]
@@ -72,6 +93,22 @@ exports.fetchArticleById = (article_id)=>{
                     return Promise.reject({
                         status: 400,
                         msg: `The username ${username} does not exist.`
+                    })
+            }
+        })
+    }
+    exports.checkTopicExists = (query)=>{
+        const {topic} = query
+        const queryStatment = `
+        SELECT * FROM topics
+        WHERE slug = $1`
+        return db
+        .query(queryStatment, [topic])
+        .then(({rows})=> {
+            if(!rows[0]){
+                    return Promise.reject({
+                        status: 400,
+                        msg: `The Topic "${topic}" is not one we cover I'm afraid.`
                     })
             }
         })
