@@ -8,7 +8,6 @@ exports.fetchAllUsers = ()=>{
     return db
     .query(queryStatement)
     .then(({rows})=>{
-        console.log(rows)
         return rows
     })
 
