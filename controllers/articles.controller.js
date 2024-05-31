@@ -1,4 +1,4 @@
-const {fetchArticleById, fetchAllArticles, fetchCommentsByArticleId, checkArticleIdExists, addCommentsByArticleId, checkUserExists, insertArticleVotes} = require("../models/articles.models")
+const {fetchArticleById, fetchAllArticles, fetchCommentsByArticleId, checkArticleIdExists, addCommentsByArticleId, checkUserExists, insertArticleVotes, checkTopicExists} = require("../models/articles.models")
 exports.getArticleById = (req,res,next) => {
     const { article_id } = req.params;
     
@@ -10,10 +10,18 @@ exports.getArticleById = (req,res,next) => {
     
 }
 exports.getAllArticles = (req,res, next) =>{
-    fetchAllArticles()
-    .then((articles)=>{
-       return res.status(200).send({articles})
+    const {query} = req
+    const promises = [fetchAllArticles(query)]
+    if(query.topic){
+        promises.push(checkTopicExists(query))
+    }
+    Promise.all(promises)
+    .then((resolvedPromises)=>{
+        const articles = resolvedPromises[0]
+            return res.status(200).send({articles})
     })
+    .catch((err)=> next(err))
+
 }
 
 exports.getCommentsbyArticleId = (req,res, next)=>{
