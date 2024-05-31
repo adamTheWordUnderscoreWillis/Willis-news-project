@@ -33,10 +33,9 @@ exports.createCommentsByArticleId = (req,res,next)=>{
     const { article_id } = req.params
     const { body } = req
 
-    const promises = [checkArticleIdExists(article_id), checkUserExists(body),  addCommentsByArticleId(article_id, body)]
-    Promise.all(promises)
-    .then((resolvedPromises)=>{
-        const comment = resolvedPromises[2]
+    addCommentsByArticleId(article_id, body)
+    .then((response)=>{
+        const comment = response
         res.status(201).send({comment})
     })
     .catch((err)=> {
