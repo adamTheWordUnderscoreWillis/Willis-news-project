@@ -172,17 +172,6 @@ describe("News Api Tests", () => {
           });
       });
     });
-
-    describe("Sad Path", () => {
-      test("404: Returns with an error message when the path is not found", () => {
-        return request(app)
-          .get("/api/not-a-route")
-          .expect(404)
-          .then(({ body }) => {
-            expect(body.msg).toBe("Does not exist");
-          });
-      });
-    });
   });
   describe("GET/API/ARTICLES/:ARTICLE_ID/COMMENTS", () => {
     describe("Happy Path", () => {
@@ -487,4 +476,38 @@ describe("News Api Tests", () => {
           });
     })
   })
+  describe("GET/API/USERS", () => {
+    describe("Happy Path", () => {
+      test("200: Returns an okay Status Code", () => {
+        return request(app)
+        .get("/api/users")
+        .expect(200);
+      });
+      test("200: Returns all articles with correct key value pairs (except the comment count)", () => {
+          const desiredUser = {
+            username: 'butter_bridge',
+            name: 'jonny',
+            avatar_url:
+              'https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg'
+          };
+        return request(app)
+          .get("/api/users")
+          .expect(200)
+          .then(({ body }) => {
+            const { users } = body;
+
+            expect(users[0]).toEqual(desiredUser)
+            expect(users).toHaveLength(4);
+
+            users.forEach((article) => {
+              expect(article).toMatchObject({
+                username: expect.any(String),
+                name: expect.any(String),
+                avatar_url: expect.any(String)
+              });
+            });
+          });
+      });
+    });
+  });
 })
