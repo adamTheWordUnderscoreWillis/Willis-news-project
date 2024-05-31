@@ -84,7 +84,7 @@ exports.fetchArticleById = (article_id)=>{
         (body, article_id, author)
         VALUES
         ($1, $2, $3)
-        RETURNING*`
+        RETURNING body`
         const queryValues = [body, article_id, username]
 
         return db

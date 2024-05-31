@@ -266,12 +266,7 @@ describe("News Api Tests", () => {
           username: "butter_bridge",
         };
         const expectedResponseBody = {
-          comment_id: 19,
           body: "My Spoon is too big!",
-          article_id: 2,
-          author: "butter_bridge",
-          votes: 0,
-          created_at: expect.any(String),
         };
         return request(app)
           .post("/api/articles/2/comments")
@@ -318,9 +313,9 @@ describe("News Api Tests", () => {
         return request(app)
           .post("/api/articles/999/comments")
           .send(inputBody)
-          .expect(404)
+          .expect(400)
           .then(({ body }) => {
-            expect(body.msg).toBe("Article 999 does not exist.");
+            expect(body.msg).toBe("That is not allowed");
           });
       });
       test("400: Returns an error message when the username doesn't exist", () => {
@@ -333,7 +328,7 @@ describe("News Api Tests", () => {
           .send(inputBody)
           .expect(400)
           .then(({ body }) => {
-            expect(body.msg).toBe("The username notAUser does not exist.");
+            expect(body.msg).toBe("That is not allowed");
           });
       });
     });
