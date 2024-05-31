@@ -1,11 +1,11 @@
 const express = require('express');
 const app = express();
-const { getAllTopics } = require('../controllers/topics.controller.js');
-const { getAllEndpoints } = require('../controllers/api.controller.js');
-const { getArticleById, getAllArticles, getCommentsbyArticleId, createCommentsByArticleId, updateArticleVotes } = require('../controllers/articles.controller.js');
-const { handleCustomErrors, handle404Errors, handleServerErrors, handlePsqlErrors } = require("../controllers/errorHandling/index.js");
-const { removeCommentById } = require('../controllers/comments.controller.js');
-const { getAllUsers } = require('../controllers/users.controllers.js');
+const { getAllTopics } = require('./controllers/topics.controller.js');
+const { getAllEndpoints } = require('./controllers/api.controller.js');
+const { getArticleById, getAllArticles, getCommentsbyArticleId, createCommentsByArticleId, updateArticleVotes } = require('./controllers/articles.controller.js');
+const { handleCustomErrors, handle404Errors, handleServerErrors, handlePsqlErrors } = require("./controllers/errorHandling/index.js");
+const { removeCommentById } = require('./controllers/comments.controller.js');
+const { getAllUsers } = require('./controllers/users.controllers.js');
 
 app.use(express.json())
 
