@@ -6,7 +6,9 @@ const { getArticleById, getAllArticles, getCommentsbyArticleId, createCommentsBy
 const { handleCustomErrors, handle404Errors, handleServerErrors, handlePsqlErrors } = require("./controllers/errorHandling/index.js");
 const { removeCommentById } = require('./controllers/comments.controller.js');
 const { getAllUsers } = require('./controllers/users.controllers.js');
+const cors = require('cors');
 
+app.use(cors());
 app.use(express.json())
 
 app.get('/api/topics', getAllTopics);
