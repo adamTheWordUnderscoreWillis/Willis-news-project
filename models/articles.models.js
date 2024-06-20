@@ -51,7 +51,7 @@ exports.fetchArticleById = (article_id)=>{
                 })
             }
         }
-        if (!["created_at", "comment_count", "votes","articles.article_id", "author"].includes(sort_by)) {
+        if (!["created_at", "count", "votes","articles.article_id", "author"].includes(sort_by)) {
             return Promise.reject({ status: 400, msg: 'Invalid sort query' });
           }
           if (!["ASC", "DESC"].includes(order)) {
