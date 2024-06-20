@@ -29,7 +29,8 @@ exports.fetchArticleById = (article_id)=>{
 }
     exports.fetchAllArticles = (query)=>{
         
-        const {topic} = query
+        const greenList = ["author", "topic", "sort_by","order"]
+        const {topic, sort_by = "articles.article_id", order = "DESC"} = query
         const queryValues = []
         let queryStatment = `
         SELECT articles.article_id, articles.title, articles.topic, articles.author, articles.created_at, articles.votes, articles.article_img_url, COUNT(comments.article_id) FROM articles
@@ -37,16 +38,25 @@ exports.fetchArticleById = (article_id)=>{
         const queryGroupBy = `
         GROUP BY (articles.article_id)`
         const queryOrderBy = `
-        ORDER BY articles.article_id DESC;`
-        const greenList = ["topic"]
+        ORDER BY ${sort_by} ${order}`
+
         const QueryKeys = Object.keys(query)
-        const firstKey = QueryKeys[0]
-        if(QueryKeys[0] && !greenList.includes(firstKey)){
-            return Promise.reject({
-                status: 400,
-                msg: `That query is not valid`
-            })
+        for(let i = 0; i<QueryKeys.length; i++){
+            const currentKey = QueryKeys[i]
+            
+            if(currentKey && !greenList.includes(currentKey)){
+                return Promise.reject({
+                    status: 400,
+                    msg: `That query is not valid`
+                })
+            }
         }
+        if (!["created_at", "comment_count", "votes","articles.article_id", "author"].includes(sort_by)) {
+            return Promise.reject({ status: 400, msg: 'Invalid sort query' });
+          }
+          if (!["ASC", "DESC"].includes(order)) {
+            return Promise.reject({ status: 400, msg: 'Invalid order query' });
+          }
         if(topic){
             queryValues.push(topic)
             queryStatment += `

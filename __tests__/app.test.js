@@ -197,16 +197,82 @@ describe("News Api Tests", () => {
 
             })
         });
-        test("200: Returns an empty array when there category is valid but has no data",()=>{
+      test("200: Returns an empty array when there category is valid but has no data",()=>{
+            return request(app)
+            .get("/api/articles?topic=paper")
+            .expect(200)
+            .then(({ body }) => {
+            const { articles } = body;
+      
+            expect(articles).toHaveLength(0);
+            })
+        })
+        test("200: Allows the user to sort by a specific criteria",()=>{
+          const CatsArticle = {
+              article_id: expect.any(Number),
+              title: expect.any(String),
+              topic: expect.any(String),
+              author: "rogersop",
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url:
+              expect.any(String),
+              comment_count: expect.any(String)
+              }
               return request(app)
-              .get("/api/articles?topic=paper")
+              .get("/api/articles?sort_by=author")
               .expect(200)
               .then(({ body }) => {
-              const { articles } = body;
-        
-              expect(articles).toHaveLength(0);
+                const { articles } = body;
+              const firstArticle = articles[0];
+
+              expect(firstArticle).toMatchObject(CatsArticle);
+  
               })
-          })
+          });
+          test("200: Orders content in ascending order", () => {
+            const desiredArticle = {
+              article_id: 1,
+              title: "Living in the shadow of a great man",
+              topic: "mitch",
+              author: "butter_bridge",
+              created_at: "2020-07-09T20:11:00.000Z",
+              votes: 100,
+              article_img_url:
+                "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+              comment_count: "11"
+            }
+            
+            return request(app)
+              .get("/api/articles?order=ASC")
+              .expect(200)
+              .then(({ body }) => {
+                const { articles } = body;
+                const firstArticle = articles[0];
+                expect(firstArticle).toMatchObject(desiredArticle);
+              });
+          });
+          test("200: Handles multiple requests", () => {
+            const desiredArticle =  {
+              article_id: 1,
+              title: 'Living in the shadow of a great man',
+              topic: 'mitch',
+              author: 'butter_bridge',
+              created_at: '2020-07-09T20:11:00.000Z',
+              votes: 100,
+              article_img_url: 'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700',
+              comment_count: '11'
+            }
+            
+            return request(app)
+              .get("/api/articles?sort_by=votes&order=ASC&topic=mitch")
+              .expect(200)
+              .then(({ body }) => {
+                const { articles } = body;
+                const lastArticle = articles[11];
+                expect(lastArticle).toMatchObject(desiredArticle);
+              });
+          });
     });
     describe("Sad Path", ()=>{
       test("400: User has tried to query with invalid category", ()=>{
@@ -223,6 +289,22 @@ describe("News Api Tests", () => {
           .expect(400)
           .then(({ body }) => {
             expect(body.msg).toBe(`The Topic "NotTopic" is not one we cover I'm afraid.`);
+          });
+      })
+      test("400: User has tried to sort by invalid option", ()=>{
+        return request(app)
+          .get("/api/articles?sort_by=title")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Invalid sort query");
+          });
+      })
+      test("400: User has tried to order by invalid option", ()=>{
+        return request(app)
+          .get("/api/articles?order=OatFlatWhite")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Invalid order query");
           });
       })
 
