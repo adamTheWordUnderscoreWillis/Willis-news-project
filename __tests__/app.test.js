@@ -104,7 +104,7 @@ describe("News Api Tests", () => {
         };
         return request(app)
           .get("/api/articles/1")
-          .expect(200)
+          .expect(200)  
           .then(({ body }) => {
             const article = body.article;
             expect(article).toEqual(desiredArticle);
